@@ -43,6 +43,11 @@ class Store extends ChangeNotifier {
   final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
   GlobalKey<FormState> get formKey => _globalKey;
 
+  String? _pass;
+  String? _user;
+  String? get pass => _pass;
+  String? get user => _user;
+
   //toogle between dark true or false to switch theme
   void changeTheme() {
     _isDark = !_isDark;
@@ -52,6 +57,14 @@ class Store extends ChangeNotifier {
   //Logic to create state that allow reset form:
   void resetForm() {
     formKey.currentState?.reset();
+    _user = null;
+    _pass = null;
+    notifyListeners();
+  }
+
+  void setUser(String? username, String? password) {
+    _user = username;
+    _pass = password;
     notifyListeners();
   }
 }
@@ -100,13 +113,41 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    'You have pushed the button this many times:',
-                  ),
-                  Text(
-                    '$_counter',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
+                  Draggable(
+                    data: "Your Data",
+                    feedback: Material(
+                      child: Column(
+                        children: [
+                          const Text(
+                              'You have pushed the button this many times:'),
+                          Text('$_counter',
+                              style:
+                                  Theme.of(context).textTheme.headlineMedium),
+                          appState.user != null
+                              ? Text(appState.user!)
+                              : Container(),
+                          appState.pass != null
+                              ? Text(appState.pass!)
+                              : Container(),
+                        ],
+                      ),
+                    ),
+                    childWhenDragging: Container(),
+                    child: Column(
+                      children: [
+                        const Text(
+                            'You have pushed the button this many times:'),
+                        Text('$_counter',
+                            style: Theme.of(context).textTheme.headlineMedium),
+                        appState.user != null
+                            ? Text(appState.user!)
+                            : Container(),
+                        appState.pass != null
+                            ? Text(appState.pass!)
+                            : Container(),
+                      ],
+                    ), // What to display when the draggable is picked up
+                  )
                 ],
               ),
             ),
@@ -135,12 +176,20 @@ class _MyHomePageState extends State<MyHomePage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(
-                              "Model text 1",
-                              style: TextStyle(
-                                  color: Theme.of(innerContainer)
-                                      .colorScheme
-                                      .onPrimaryContainer),
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _counter = 0;
+                                });
+                              },
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Theme.of(innerContainer)
+                                            .colorScheme
+                                            .tertiary),
+                              ),
+                              child: const Text('Reset count'),
                             ),
                             ElevatedButton(
                               onPressed: () {
@@ -150,7 +199,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           ],
                         ),
-                        const Expanded(child: FormExample()),
+                        const Expanded(flex: 2, child: FormExample()),
                       ],
                     ),
                   ),
@@ -191,7 +240,7 @@ class _FormExampleState extends State<FormExample> {
       child: Form(
         key: appState.formKey,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             TextFormField(
               decoration: const InputDecoration(
@@ -205,7 +254,9 @@ class _FormExampleState extends State<FormExample> {
                 labelText: 'Enter your password',
               ),
               validator: (value) => value!.isEmpty ? 'Enter password' : null,
-              onSaved: (value) => _password = value,
+              onSaved: (value) {
+                _password = value;
+              },
             ),
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
@@ -213,6 +264,7 @@ class _FormExampleState extends State<FormExample> {
                 onPressed: () {
                   if (appState.formKey.currentState!.validate()) {
                     appState.formKey.currentState!.save();
+                    appState.setUser(_username, _password);
                     // Ahora las variables _username y _password contienen los valores ingresados
                     // Now the logic to do the post request:
                   }
@@ -221,9 +273,6 @@ class _FormExampleState extends State<FormExample> {
                 child: const Text('Submit'),
               ),
             ),
-            Center(
-                child: Expanded(
-                    child: Text("Username: $_username, Password: $_password"))),
           ],
         ),
       ),
