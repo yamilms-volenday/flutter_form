@@ -231,6 +231,22 @@ class FormExample extends StatefulWidget {
 class _FormExampleState extends State<FormExample> {
   String? _username;
   String? _password;
+  late FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _focusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the focus node when the Form is disposed.
+    _focusNode.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -248,6 +264,7 @@ class _FormExampleState extends State<FormExample> {
               ),
               validator: (value) => value!.isEmpty ? 'Enter username' : null,
               onSaved: (value) => _username = value,
+              autofocus: true,
             ),
             TextFormField(
               decoration: const InputDecoration(
@@ -257,6 +274,7 @@ class _FormExampleState extends State<FormExample> {
               onSaved: (value) {
                 _password = value;
               },
+              focusNode: _focusNode,
             ),
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
@@ -267,6 +285,8 @@ class _FormExampleState extends State<FormExample> {
                     appState.setUser(_username, _password);
                     // Ahora las variables _username y _password contienen los valores ingresados
                     // Now the logic to do the post request:
+                  } else {
+                    _focusNode.requestFocus();
                   }
                   setState(() {});
                 },
