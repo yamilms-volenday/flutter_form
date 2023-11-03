@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_sandbox/settings.dart';
 
 void main() {
   runApp(const MyApp());
@@ -91,131 +92,161 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     Store appState = context.watch<Store>();
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text(widget.title),
-        actions: [
-          IconButton(
-            onPressed: () {
-              appState.changeTheme();
-            },
-            icon: const Icon(Icons.brightness_4),
-          ),
-        ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              flex: 1,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Draggable(
-                    data: "Your Data",
-                    feedback: Material(
-                      child: Column(
-                        children: [
-                          const Text(
-                              'You have pushed the button this many times:'),
-                          Text('$_counter',
-                              style:
-                                  Theme.of(context).textTheme.headlineMedium),
-                          appState.user != null
-                              ? Text(appState.user!)
-                              : Container(),
-                          appState.pass != null
-                              ? Text(appState.pass!)
-                              : Container(),
-                        ],
-                      ),
-                    ),
-                    childWhenDragging: Container(),
-                    child: Column(
-                      children: [
-                        const Text(
-                            'You have pushed the button this many times:'),
-                        Text('$_counter',
-                            style: Theme.of(context).textTheme.headlineMedium),
-                        appState.user != null
-                            ? Text(appState.user!)
-                            : Container(),
-                        appState.pass != null
-                            ? Text(appState.pass!)
-                            : Container(),
-                      ],
-                    ), // What to display when the draggable is picked up
-                  )
-                ],
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          title: Text(widget.title),
+          bottom: TabBar(
+            labelColor: Theme.of(context)
+                .colorScheme
+                .onPrimary, // Color of the icon when selected
+            unselectedLabelColor: Theme.of(context)
+                .colorScheme
+                .onPrimary
+                .withAlpha(80), // Color of the icon when not selected
+            tabs: const [
+              Tab(
+                icon: Icon(Icons.home),
+                text: 'Home',
               ),
+              Tab(
+                icon: Icon(Icons.settings),
+                text: 'Settings',
+              ),
+            ],
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                appState.changeTheme();
+              },
+              icon: const Icon(Icons.brightness_4),
             ),
-            Theme(
-              data: ThemeData(
-                  colorScheme: ColorScheme.fromSeed(
-                seedColor: Colors.deepPurple,
-                brightness:
-                    appState.isDark ? Brightness.dark : Brightness.light,
-              )),
-              child: Builder(builder: (innerContainer) {
-                return Expanded(
-                  flex: 2,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: appState.isDark
-                          ? Theme.of(innerContainer).colorScheme.surface
-                          : Theme.of(innerContainer)
-                              .colorScheme
-                              .primaryContainer,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  _counter = 0;
-                                });
-                              },
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Theme.of(innerContainer)
-                                            .colorScheme
-                                            .tertiary),
-                              ),
-                              child: const Text('Reset count'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                appState.resetForm();
-                              },
-                              child: const Text('Reset form'),
-                            ),
-                          ],
-                        ),
-                        const Expanded(flex: 2, child: FormExample()),
-                      ],
-                    ),
-                  ),
-                );
-              }),
-            )
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        backgroundColor: Theme.of(context).colorScheme.secondary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        elevation: appState.isDark ? 0 : 4,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        body: TabBarView(
+          children: [
+            Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Draggable(
+                        data: "Your Data",
+                        feedback: Material(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('You are draggin the widget:'),
+                              Text('$_counter',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium),
+                              appState.user != null
+                                  ? Text(appState.user!)
+                                  : Container(),
+                              appState.pass != null
+                                  ? Text(appState.pass!)
+                                  : Container(),
+                            ],
+                          ),
+                        ),
+                        childWhenDragging: Container(),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                                'You have pushed the button this many times:'),
+                            Text('$_counter',
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium),
+                            appState.user != null
+                                ? Text(appState.user!)
+                                : Container(),
+                            appState.pass != null
+                                ? Text(appState.pass!)
+                                : Container(),
+                          ],
+                        ), // What to display when the draggable is picked up
+                      ),
+                    ),
+                    Theme(
+                      data: ThemeData(
+                          colorScheme: ColorScheme.fromSeed(
+                        seedColor: Colors.deepPurple,
+                        brightness: appState.isDark
+                            ? Brightness.dark
+                            : Brightness.light,
+                      )),
+                      child: Builder(builder: (innerContainer) {
+                        return Expanded(
+                          flex: 2,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: appState.isDark
+                                  ? Theme.of(innerContainer).colorScheme.surface
+                                  : Theme.of(innerContainer)
+                                      .colorScheme
+                                      .primaryContainer,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          _counter = 0;
+                                        });
+                                      },
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                Theme.of(innerContainer)
+                                                    .colorScheme
+                                                    .tertiary),
+                                      ),
+                                      child: const Text('Reset count'),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        appState.resetForm();
+                                      },
+                                      child: const Text('Reset form'),
+                                    ),
+                                  ],
+                                ),
+                                const Expanded(flex: 2, child: FormExample()),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+              ),
+              floatingActionButton: FloatingActionButton(
+                onPressed: _incrementCounter,
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                elevation: appState.isDark ? 0 : 4,
+                tooltip: 'Increment',
+                child: const Icon(Icons.add),
+              ),
+            ),
+            const Center(
+              child: Settings(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -251,49 +282,51 @@ class _FormExampleState extends State<FormExample> {
   @override
   Widget build(BuildContext context) {
     Store appState = context.watch<Store>();
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Form(
-        key: appState.formKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Enter your username',
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Form(
+          key: appState.formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Enter your username',
+                ),
+                validator: (value) => value!.isEmpty ? 'Enter username' : null,
+                onSaved: (value) => _username = value,
+                autofocus: true,
               ),
-              validator: (value) => value!.isEmpty ? 'Enter username' : null,
-              onSaved: (value) => _username = value,
-              autofocus: true,
-            ),
-            TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Enter your password',
-              ),
-              validator: (value) => value!.isEmpty ? 'Enter password' : null,
-              onSaved: (value) {
-                _password = value;
-              },
-              focusNode: _focusNode,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  if (appState.formKey.currentState!.validate()) {
-                    appState.formKey.currentState!.save();
-                    appState.setUser(_username, _password);
-                    // Ahora las variables _username y _password contienen los valores ingresados
-                    // Now the logic to do the post request:
-                  } else {
-                    _focusNode.requestFocus();
-                  }
-                  setState(() {});
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Enter your password',
+                ),
+                validator: (value) => value!.isEmpty ? 'Enter password' : null,
+                onSaved: (value) {
+                  _password = value;
                 },
-                child: const Text('Submit'),
+                focusNode: _focusNode,
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (appState.formKey.currentState!.validate()) {
+                      appState.formKey.currentState!.save();
+                      appState.setUser(_username, _password);
+                      // Ahora las variables _username y _password contienen los valores ingresados
+                      // Now the logic to do the post request:
+                    } else {
+                      _focusNode.requestFocus();
+                    }
+                    setState(() {});
+                  },
+                  child: const Text('Submit'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
